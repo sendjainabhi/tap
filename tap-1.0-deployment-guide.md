@@ -302,8 +302,8 @@ export registry_user=<registry_user>
 export registry_password=<registry_password>
 
 #APPEND GUI SETTINGS
-rm tap-values.yaml
-cat <<EOF | tee tap-values.yaml
+rm tap-values-run.yaml
+cat <<EOF | tee tap-values-run.yaml
 profile: full
 ceip_policy_disclosed: true
 buildservice:
@@ -343,7 +343,7 @@ excluded_packages:
 
 EOF
 
-tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values.yaml -n tap-install
+tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values-run.yaml -n tap-install
 tanzu package installed get tap -n tap-install
 
 #check all build cluster package installed succesfully
@@ -391,8 +391,8 @@ export git_catalog_url=<git_catalog_url>
 
 
 #APPEND GUI SETTINGS
-rm tap-values.yaml
-cat <<EOF | tee tap-values.yaml
+rm tap-values-ui.yaml
+cat <<EOF | tee tap-values-ui.yaml
 profile: full
 ceip_policy_disclosed: true
 buildservice:
@@ -460,7 +460,7 @@ excluded_packages:
 
 EOF
 
-tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values.yaml -n tap-install
+tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values-ui.yaml -n tap-install
 tanzu package installed get tap -n tap-install
 
 #check all build cluster package installed succesfully
