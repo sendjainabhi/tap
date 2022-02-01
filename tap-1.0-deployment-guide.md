@@ -129,8 +129,8 @@ export registry_user=<registry_user>
 export registry_password=<registry_password>
 
 #APPEND GUI SETTINGS
-rm tap-values.yaml
-cat <<EOF | tee tap-values.yaml
+rm tap-values-build.yaml
+cat <<EOF | tee tap-values-build.yaml
 profile: full
 ceip_policy_disclosed: true
 buildservice:
@@ -170,7 +170,7 @@ excluded_packages:
 
 EOF
 
-tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values.yaml -n tap-install
+tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values-build.yaml -n tap-install
 tanzu package installed get tap -n tap-install
 
 #check all build cluster package installed succesfully
@@ -289,7 +289,7 @@ Perform steps of [Add the Tanzu Application Platform package repository](#tap-pa
 
 ### <a id=tap-profile-run> </a>Step 3: Install Tanzu Application Platform run profile
 
-Provide following user inputs to set environments variables into commands and execute them to install build profile
+Provide following user inputs to set environments variables into commands and execute them to install run profile
 
 * registry_server - uri of registry server like Azure container registry or Harbor etc. (example - tappoc.azurecr.io)
 * registry_user - registry server user
@@ -368,7 +368,7 @@ Perform steps of [Add the Tanzu Application Platform package repository](#tap-pa
 
 ### <a id=tap-profile-ui> </a>Step 3: Install Tanzu Application Platform ui profile
 
-Provide following user inputs to set environments variables into commands and execute them to install build profile
+Provide following user inputs to set environments variables into commands and execute them to install ui profile
 
 * registry_server - uri of registry server like Azure container registry or Harbor etc. (example - tappoc.azurecr.io)
 * registry_user - registry server user
@@ -441,22 +441,33 @@ metadata_store:
   app_service_type: LoadBalancer
 
 excluded_packages:
-  - accelerator.apps.tanzu.vmware.com
-  - api-portal.tanzu.vmware.com
-  - build.appliveview.tanzu.vmware.com
-  - buildservice.tanzu.vmware.com
-  - controller.conventions.apps.tanzu.vmware.com
-  - developer-conventions.tanzu.vmware.com
-  - grype.scanning.apps.tanzu.vmware.com
-  - learningcenter.tanzu.vmware.com
-  - metadata-store.apps.tanzu.vmware.com
-  - ootb-supply-chain-basic.tanzu.vmware.com
-  - ootb-supply-chain-testing.tanzu.vmware.com
-  - ootb-supply-chain-testing-scanning.tanzu.vmware.com
-  - scanning.apps.tanzu.vmware.com
-  - spring-boot-conventions.tanzu.vmware.com
-  - tap-gui.tanzu.vmware.com
-  - workshops.learningcenter.tanzu.vmware.com
+ - run.appliveview.tanzu.vmware.com
+ - cnrs.tanzu.vmware.com
+ - ootb-delivery-basic.tanzu.vmware.com
+ - developer-conventions.tanzu.vmware.com
+ - image-policy-webhook.signing.apps.tanzu.vmware.com
+ - learningcenter.tanzu.vmware.com
+ - workshops.learningcenter.tanzu.vmware.com
+ - services-toolkit.tanzu.vmware.com
+ - service-bindings.labs.vmware.com
+ - build.appliveview.tanzu.vmware.com
+ - buildservice.tanzu.vmware.com
+ - controller.conventions.apps.tanzu.vmware.com
+ - developer-conventions.tanzu.vmware.com
+ - grype.scanning.apps.tanzu.vmware.com
+ - metadata-store.apps.tanzu.vmware.com
+ - ootb-supply-chain-basic.tanzu.vmware.com
+ - ootb-supply-chain-testing.tanzu.vmware.com
+ - ootb-supply-chain-testing-scanning.tanzu.vmware.com
+ - scanning.apps.tanzu.vmware.com
+ - spring-boot-conventions.tanzu.vmware.com
+ - ootb-templates.tanzu.vmware.com
+ - fluxcd.source.controller.tanzu.vmware.com
+ - accelerator.apps.tanzu.vmware.com
+ - controller.source.apps.tanzu.vmware.com
+ - tekton.tanzu.vmware.com
+ - image-policy-webhook.signing.apps.tanzu.vmware.com 
+ - cartographer.tanzu.vmware.com
 
 EOF
 
@@ -517,9 +528,9 @@ Please ensure you login into Kubernetes UI cluster and perform steps of [Install
 Perform steps of [Add the Tanzu Application Platform package repository](#tap-package-repo)
 
 
-### <a id=tap-profile-full> </a>Step 3: Install Tanzu Application Platform personal(full) profile
+### <a id=tap-profile-full> </a>Step 3: Install Tanzu Application Platform personal profile
 
-Provide following user inputs to set environments variables into commands and execute them to install build profile
+Provide following user inputs to set environments variables into commands and execute them to install full profile
 
 * registry_server - uri of registry server like Azure container registry or Harbor etc. (example - tappoc.azurecr.io)
 * registry_user - registry server user
@@ -542,8 +553,8 @@ export git_catalog_url=<git_catalog_url>
 
 
 #APPEND GUI SETTINGS
-rm tap-values.yaml
-cat <<EOF | tee tap-values.yaml
+rm tap-values-personal.yaml
+cat <<EOF | tee tap-values-personal.yaml
 profile: full
 ceip_policy_disclosed: true
 buildservice:
@@ -591,9 +602,14 @@ cnrs:
 metadata_store:
   app_service_type: LoadBalancer
 
+excluded_packages:
+  - accelerator.apps.tanzu.vmware.com
+  - api-portal.tanzu.vmware.com
+  - tap-gui.tanzu.vmware.com
+
 EOF
 
-tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values.yaml -n tap-install
+tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values-personal.yaml -n tap-install
 tanzu package installed get tap -n tap-install
 
 #check all build cluster package installed succesfully
