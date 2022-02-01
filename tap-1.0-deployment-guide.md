@@ -328,18 +328,22 @@ metadata_store:
   app_service_type: LoadBalancer
 
 excluded_packages:
-  - accelerator.apps.tanzu.vmware.com
-  - run.appliveview.tanzu.vmware.com
-  - api-portal.tanzu.vmware.com
-  - cnrs.tanzu.vmware.com
-  - ootb-delivery-basic.tanzu.vmware.com
-  - developer-conventions.tanzu.vmware.com
-  - image-policy-webhook.signing.apps.tanzu.vmware.com
-  - learningcenter.tanzu.vmware.com
-  - workshops.learningcenter.tanzu.vmware.com
-  - services-toolkit.tanzu.vmware.com
-  - service-bindings.labs.vmware.com
-  - tap-gui.tanzu.vmware.com
+ - accelerator.apps.tanzu.vmware.com
+ - api-portal.tanzu.vmware.com
+ - build.appliveview.tanzu.vmware.com
+ - buildservice.tanzu.vmware.com
+ - controller.conventions.apps.tanzu.vmware.com
+ - developer-conventions.tanzu.vmware.com
+ - grype.scanning.apps.tanzu.vmware.com
+ - learningcenter.tanzu.vmware.com
+ - metadata-store.apps.tanzu.vmware.com
+ - ootb-supply-chain-basic.tanzu.vmware.com
+ - ootb-supply-chain-testing.tanzu.vmware.com
+ - ootb-supply-chain-testing-scanning.tanzu.vmware.com
+ - scanning.apps.tanzu.vmware.com
+ - spring-boot-conventions.tanzu.vmware.com
+ - tap-gui.tanzu.vmware.com
+ - workshops.learningcenter.tanzu.vmware.com
 
 EOF
 
@@ -491,6 +495,9 @@ Perform steps of [Set up developer namespaces to use installed packages](#tap-de
 Execute following command to see the demo of sample app deployment into Tanzu Application Platform
 
 ```
+# login to kubernetes workload build cluster 
+kubectl config get-contexts
+kubectl config use-context <cluster config name>
 
 export app_name=tap-demo
 export git_app_url=https://github.com/sample-accelerators/spring-petclinic
@@ -502,8 +509,15 @@ tanzu apps workload list
 #generate work load yml file
 tanzu apps workload create ${app_name} --git-repo ${git_app_url} --git-branch main --type web --label app.kubernetes.io/part-of=${app_name} --yes --dry-run
 
+
 #create work load for app
-tanzu apps workload create ${app_name} --git-repo ${git_app_url} --git-branch main --type web --label app.kubernetes.io/part-of=${app_name} --yes
+tanzu apps workload create ${app_name} \
+--git-repo ${git_app_url} \
+--git-branch main \
+--git-tag tap-1.0 \
+--type web \
+--label app.kubernetes.io/part-of=${app_name} \
+--yes
 
 #app deployment logs
 tanzu apps workload tail ${app_name} --since 10m --timestamp
