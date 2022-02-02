@@ -528,9 +528,10 @@ tanzu apps workload get ${app_name}
 #saved deliverables yaml configuration into local directory and remove unwated status section from it. check below sample file 
 kubectl get deliverables ${app_name} -o yaml > app-deli.yaml
 
-#copy  app url and paste into browser to see the sample app-deli.yaml
 
-sameple delive
+
+#sample deliverables 
+##################################################
 apiVersion: carto.run/v1alpha1
 kind: Deliverable
 metadata:
@@ -552,6 +553,8 @@ spec:
   source:
     image: tapdemo2.azurecr.io/supply-chain/tap-demo-default-bundle:83c468d4-4fd0-4f3b-9e57-9cdfe57e730a
 
+##################################################################
+
  # login to kubernetes workload run cluster 
 kubectl config get-contexts
 kubectl config use-context <cluster config name>  
@@ -563,7 +566,10 @@ kubeclt apply -f app-deli.yaml
 #check app status
 kubectl get deliverables ${app_name}
 
+#copy  app url and paste into browser to see the sample app
+
 ```
+
 
 
 ## <a id=tap-full> </a> Setup Tanzu Application Platform personal(full) cluster
