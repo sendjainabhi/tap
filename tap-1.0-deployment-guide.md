@@ -30,9 +30,6 @@ The following provides an overview of the major steps necessary to deploy Tanzu 
 4. [Setup Tanzu Application Platform Full(personal) cluster](#tap-full)
 
 
- [Install tanzu cluster essentials and tanzu cli](#tanzu-essential)
-
-
 
 ## <a id=tap-build> </a> Setup Tanzu Application Platform Build cluster
 
@@ -528,7 +525,43 @@ tanzu apps workload list
 #get app details
 tanzu apps workload get ${app_name}
 
-#copy  app url and paste into browser to see the sample app
+#saved deliverables yaml configuration into local directory and remove unwated status section from it. check below sample file 
+kubectl get deliverables ${app_name} -o yaml > app-deli.yaml
+
+#copy  app url and paste into browser to see the sample app-deli.yaml
+
+sameple delive
+apiVersion: carto.run/v1alpha1
+kind: Deliverable
+metadata:
+  creationTimestamp: "2022-02-01T20:19:19Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/component: deliverable
+    app.kubernetes.io/part-of: tap-demo
+    app.tanzu.vmware.com/deliverable-type: web
+    carto.run/cluster-supply-chain-name: source-to-url
+    carto.run/cluster-template-name: deliverable-template
+    carto.run/resource-name: deliverable
+    carto.run/template-kind: ClusterTemplate
+    carto.run/workload-name: tap-demo
+    carto.run/workload-namespace: default
+  name: tap-demo
+  namespace: default
+spec:
+  source:
+    image: tapdemo2.azurecr.io/supply-chain/tap-demo-default-bundle:83c468d4-4fd0-4f3b-9e57-9cdfe57e730a
+
+ # login to kubernetes workload run cluster 
+kubectl config get-contexts
+kubectl config use-context <cluster config name>  
+
+#apply app-deli into run cluster 
+
+kubeclt apply -f app-deli.yaml
+
+#check app status
+kubectl get deliverables ${app_name}
 
 ```
 
@@ -617,9 +650,15 @@ metadata_store:
   app_service_type: LoadBalancer
 
 excluded_packages:
-  - accelerator.apps.tanzu.vmware.com
-  - api-portal.tanzu.vmware.com
-  - tap-gui.tanzu.vmware.com
+ - accelerator.apps.tanzu.vmware.com
+ - api-portal.tanzu.vmware.com
+ - learningcenter.tanzu.vmware.com
+ - metadata-store.apps.tanzu.vmware.com
+ - ootb-supply-chain-testing.tanzu.vmware.com
+ - ootb-supply-chain-testing-scanning.tanzu.vmware.com
+ - tap-gui.tanzu.vmware.com
+ - workshops.learningcenter.tanzu.vmware.com
+
 
 EOF
 
@@ -637,6 +676,10 @@ kubectl get svc -n tanzu-system-ingress
  
 ### Step 4: Set up developer namespaces to use installed packages 
 Perform steps of [Set up developer namespaces to use installed packages](#tap-dev-namespace)
+
+### Troubleshooting Tanzu Application Platform
+
+You can use commad to see the tanu package installation failure reason `kubectl get packageinstall/<package> -n tap-install -o yaml`. Refer [Troubleshooting Tanzu Application Platform Tips](https://docs.vmware.com/en/Tanzu-Application-Platform/0.4/tap/GUID-troubleshooting.html) 
 
 ### Deploy Sample application 
 See the steps to deploy and test [sample application](#tap-sample-app). You can refer [Deploy Application documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-getting-started.html) for further details.
