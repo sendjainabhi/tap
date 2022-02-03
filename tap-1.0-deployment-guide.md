@@ -291,12 +291,18 @@ Provide following user inputs to set environments variables into commands and ex
 * registry_server - uri of registry server like Azure container registry or Harbor etc. (example - tappoc.azurecr.io)
 * registry_user - registry server user
 * registry_password - registry server user
+* cnrs_domain - cnrs app domain (could be sub domain  of main domain like example - run.customer0.io)
+
+**Note** - Change contour setting into tap-values-run.yaml if you are not using aws. given example are for aws cloud. 
 
 
 ```
 export registry_server=<registry server uri>
 export registry_user=<registry_user>
 export registry_password=<registry_password>
+export cnrs_domain=<domain for app >
+
+#example of cnrs app domain - run.customer0.io
 
 #APPEND GUI SETTINGS
 rm tap-values-run.yaml
@@ -324,6 +330,15 @@ tap_gui:
 metadata_store:
   app_service_type: LoadBalancer
 
+contour:
+  infrastructure_provider: aws
+  envoy:
+    service:
+      aws:
+        LBType: nlb
+cnrs:
+  domain_name: $cnrs_domain
+
 excluded_packages:
  - accelerator.apps.tanzu.vmware.com
  - api-portal.tanzu.vmware.com
@@ -349,6 +364,13 @@ tanzu package installed get tap -n tap-install
 
 #check all build cluster package installed succesfully
 tanzu package installed list -A
+
+#check ingress external ip
+kubectl get svc -n tanzu-system-ingress
+
+#pick external ip from service output  and configure DNS wild card(*) into your DNS server like aws route 53 etc. 
+# example - *.run.customer0.io ==> <ingress external ip/cname>
+
 
 ```
  
@@ -379,6 +401,8 @@ Provide following user inputs to set environments variables into commands and ex
 * git_catalog_url - git catelog url. if you don't have one , use this [example](https://github.com/sendjainabhi/tap/blob/main/catalog-info.yaml)
 
  Refer [full profile](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install.html#full-profile) documentation for further details. 
+
+ **Note** - app_domain could be main domain or subdomain of main domain like example - main domain - **customer0.io** , ui cluster subdomain (app_domain) - **ui.customer0.io** . 
 
 
 ```
@@ -480,7 +504,8 @@ tanzu package installed list -A
 
 kubectl get svc -n tanzu-system-ingress
 
-#pick external ip from output and configure DNS wild card into your DNS server like aws route 53 etc. 
+#pick external ip from service output  and configure DNS wild card(*) into your DNS server like aws route 53 etc. 
+# example - *.ui.customer0.io ==> <ingress external ip/cname>
 
 ```
  
@@ -565,6 +590,9 @@ kubeclt apply -f app-deli.yaml
 
 #check app status
 kubectl get deliverables ${app_name}
+
+#get app url 
+kubectl get all -A | grep serving
 
 #copy  app url and paste into browser to see the sample app
 
@@ -685,7 +713,14 @@ Perform steps of [Set up developer namespaces to use installed packages](#tap-de
 
 ### Troubleshooting Tanzu Application Platform
 
-You can use commad to see the tanu package installation failure reason `kubectl get packageinstall/<package> -n tap-install -o yaml`. Refer [Troubleshooting Tanzu Application Platform Tips](https://docs.vmware.com/en/Tanzu-Application-Platform/0.4/tap/GUID-troubleshooting.html) 
+You can use commad to see the tanu package installation failure reason `kubectl get packageinstall/<package> -n tap-install -o yaml`. Refer [Troubleshooting Tanzu Application Platform Tips](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-troubleshooting.html) 
 
 ### Deploy Sample application 
 See the steps to deploy and test [sample application](#tap-sample-app). You can refer [Deploy Application documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-getting-started.html) for further details.
+
+### Service Bindings for Kubernetes
+
+You can see [Service Bindings for Kubernetes](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-service-bindings-about.html)  for more details.
+### Tanzu Application Platform GUI auth provider
+
+You can see [auth provider documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-tap-gui-auth.html)  for more details.
