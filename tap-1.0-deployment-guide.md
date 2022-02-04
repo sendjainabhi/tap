@@ -761,6 +761,13 @@ kubectl get all -A | grep serving
 ```
 
 
+
+### Register Entity into tap-gui 
+* open tap-gui url and click on **Register Entity** button and provide catalog-info.yaml file url of your app. See [Example](https://github.com/sample-accelerators/tanzu-java-web-app/blob/main/catalog/catalog-info.yaml)
+
+* Make sure you have setup 'app.kubernetes.io/part-of=**app name** correctly into your app catalog-info.yaml. and it should match with your app name. 
+**Example `'backstage.io/kubernetes-label-selector': 'app.kubernetes.io/part-of=tap-demo2' `**
+
 ### Troubleshooting Tanzu Application Platform
 
 You can use commad to see the tanu package installation failure reason `kubectl get packageinstall/<package> -n tap-install -o yaml`. Refer [Troubleshooting Tanzu Application Platform Tips](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-troubleshooting.html) 
