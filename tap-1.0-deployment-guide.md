@@ -3,6 +3,13 @@
 
 ## Executive Summary
 This deployment guide outlines a deployment steps of VMware Tanzu Application Platform on Kubernetes workload cluster. 
+Will create 4 following clusters to implement Reference Design of Tanzu Application Platform  -
+
+* Tanzu Application Platform  Build Cluster 
+* Tanzu Application Platform  Run Cluster 
+* Tanzu Application Platform  UI Cluster 
+* Tanzu Application Platform  Workspace Cluster 
+
 ## Prerequisites
 Before deploying VMware Tanzu Application Platform , ensure that the following are set up.
 
@@ -32,6 +39,8 @@ The following provides an overview of the major steps necessary to deploy Tanzu 
 
 
 ## <a id=tap-build> </a> Setup Tanzu Application Platform Build cluster
+
+The build Cluster is responsible for taking a developer's source code commits and applying a supply chain that will produce a container image and Kubernetes resources for deploying on a run cluster
 
 ### <a id=tanzu-essential> </a> Step 1: Install tanzu cluster essentials and tanzu cli
 
@@ -277,6 +286,8 @@ EOF
 
 ## <a id=tap-run> </a> Setup Tanzu Application Platform Run cluster
 
+The run cluster will read the container image and Kubernetes resources created by the build cluster and run them as defined in the Deliverable object for each application
+
 ### Step 1: Install tanzu cluster essentials and tanzu cli - 
 Please ensure you login into Kubernetes run cluster and perform steps of [Install tanzu cluster essentials and tanzu cli](#tanzu-essential). 
 
@@ -381,6 +392,8 @@ You can execute above Steps 1-4 of [Setup Tanzu Application Platform Run cluster
 
 
 ## <a id=tap-ui> </a> Setup Tanzu Application Platform UI cluster
+
+The UI cluster is designed to run the web applications for TAP. Specifically Tanzu Learning Center, Tanzu Application Portal GUI, and Tanzu API Portal
 
 ### Step 1: Install tanzu cluster essentials and tanzu cli - 
 Please ensure you login into Kubernetes UI cluster and perform steps of [Install tanzu cluster essentials and tanzu cli](#tanzu-essential). 
@@ -601,6 +614,8 @@ kubectl get all -A | grep serving
 
 
 ## <a id=tap-full> </a> Setup Tanzu Application Platform Workspace cluster
+
+The workspace cluster is for "inner loop" development iteration where developers are connecting via their IDE to rapidly iterate on new software features
 
 ### Step 1: Install tanzu cluster essentials and tanzu cli - 
 Please ensure you login into Kubernetes UI cluster and perform steps of [Install tanzu cluster essentials and tanzu cli](#tanzu-essential). 
