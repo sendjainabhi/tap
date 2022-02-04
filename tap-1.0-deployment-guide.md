@@ -35,6 +35,7 @@ The following provides an overview of the major steps necessary to deploy Tanzu 
 2. [Setup Tanzu Application Platform Run cluster](#tap-run)
 3. [Setup Tanzu Application Platform UI cluster](#tap-ui)
 4. [Setup Tanzu Application Platform Workspace cluster](#tap-full)
+5. [App Deployment](#tap-sample-app)
 
 
 
@@ -412,10 +413,22 @@ Provide following user inputs to set environments variables into commands and ex
 * github_token - git hub account token.
 * app_domain  - app domain you want to use for tap-gui
 * git_catalog_url - git catelog url. if you don't have one , use this [example](https://github.com/sendjainabhi/tap/blob/main/catalog-info.yaml)
+* run_cluster_name - **Tanzu Application platform Run** cluster name
+* run_cluster_api - **Tanzu Application platform Run**  cluster kubernetes api url
+* run_cluster_serviceAccountToken - **Tanzu Application platform Run**  cluster serviceAccountToken
 
- Refer [full profile](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install.html#full-profile) documentation for further details. 
+ See [full profile](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install.html#full-profile) documentation for further details. 
 
- **Note** - app_domain could be main domain or subdomain of main domain like example - main domain - **customer0.io** , ui cluster subdomain (app_domain) - **ui.customer0.io** . 
+ **Notes** - 
+  1. app_domain could be main domain or subdomain of main domain like example - main domain - **customer0.io** , ui cluster subdomain (app_domain) - **ui.customer0.io** . 
+  2. You can get run_cluster_serviceAccountToken using below command runnig into your run cluster
+  ```
+  kubectl -n <NAMESPACE> get secret $(kubectl -n <NAMESPACE> get sa <SERVICE_ACCOUNT_NAME> -o=json \
+| jq -r '.secrets[0].name') -o=json \
+| jq -r '.data["token"]' \
+| base64 --decode
+  ```
+  See [Backstage docs ](https://backstage.io/docs/features/kubernetes/configuration#label-selector-query-annotation)  for multicluster/multiTenant details. 
 
 
 ```
@@ -426,6 +439,9 @@ export registry_password=<registry_password>
 export github_token=<github_token>
 export app_domain=<app_domain>
 export git_catalog_url=<git_catalog_url>
+export run_cluster_name=<run cluster name>
+export run_cluster_api=<run cluster kubernetes api url>
+export run_cluster_serviceAccountToken=<run cluster serviceAccountToken>
 
 
 #APPEND GUI SETTINGS
@@ -468,6 +484,20 @@ tap_gui:
       github:
         - host: github.com
           token: $github_token
+
+    kubernetes:
+      serviceLocatorMethod:
+        type: "multiTenant"
+      clusterLocatorMethods:
+        - type: "config"
+          clusters:
+            - url: $run_cluster_api
+              name: $run_cluster_name
+              authProvider: "serviceAccount"
+              skipTLSVerify: true
+              skipMetricsLookup: true
+              serviceAccountToken: $run_cluster_serviceAccountToken
+      
 contour:
   envoy:
     service:
@@ -478,34 +508,35 @@ cnrs:
 metadata_store:
   app_service_type: LoadBalancer
 
+server:
+  service_type: "LoadBalancer"
+  watched_namespace: "accelerator-system"
+samples:
+  include: true
+
 excluded_packages:
- - run.appliveview.tanzu.vmware.com
- - cnrs.tanzu.vmware.com
- - ootb-delivery-basic.tanzu.vmware.com
- - developer-conventions.tanzu.vmware.com
- - image-policy-webhook.signing.apps.tanzu.vmware.com
- - learningcenter.tanzu.vmware.com
- - workshops.learningcenter.tanzu.vmware.com
- - services-toolkit.tanzu.vmware.com
- - service-bindings.labs.vmware.com
- - build.appliveview.tanzu.vmware.com
- - buildservice.tanzu.vmware.com
- - controller.conventions.apps.tanzu.vmware.com
- - developer-conventions.tanzu.vmware.com
- - grype.scanning.apps.tanzu.vmware.com
- - metadata-store.apps.tanzu.vmware.com
- - ootb-supply-chain-basic.tanzu.vmware.com
- - ootb-supply-chain-testing.tanzu.vmware.com
- - ootb-supply-chain-testing-scanning.tanzu.vmware.com
- - scanning.apps.tanzu.vmware.com
- - spring-boot-conventions.tanzu.vmware.com
- - ootb-templates.tanzu.vmware.com
- - fluxcd.source.controller.tanzu.vmware.com
- - accelerator.apps.tanzu.vmware.com
- - controller.source.apps.tanzu.vmware.com
- - tekton.tanzu.vmware.com
- - image-policy-webhook.signing.apps.tanzu.vmware.com 
- - cartographer.tanzu.vmware.com
+  - cnrs.tanzu.vmware.com
+  - ootb-delivery-basic.tanzu.vmware.com
+  - developer-conventions.tanzu.vmware.com
+  - image-policy-webhook.signing.apps.tanzu.vmware.com
+  - workshops.learningcenter.tanzu.vmware.com
+  - services-toolkit.tanzu.vmware.com
+  - service-bindings.labs.vmware.com
+  - build.appliveview.tanzu.vmware.com
+  - buildservice.tanzu.vmware.com
+  - controller.conventions.apps.tanzu.vmware.com
+  - developer-conventions.tanzu.vmware.com
+  - grype.scanning.apps.tanzu.vmware.com
+  - metadata-store.apps.tanzu.vmware.com
+  - ootb-supply-chain-basic.tanzu.vmware.com
+  - ootb-supply-chain-testing.tanzu.vmware.com
+  - ootb-supply-chain-testing-scanning.tanzu.vmware.com
+  - scanning.apps.tanzu.vmware.com
+  - spring-boot-conventions.tanzu.vmware.com
+  - ootb-templates.tanzu.vmware.com
+  - tekton.tanzu.vmware.com
+  - image-policy-webhook.signing.apps.tanzu.vmware.com
+  - cartographer.tanzu.vmware.com
 
 EOF
 
@@ -525,92 +556,8 @@ kubectl get svc -n tanzu-system-ingress
 ### Step 4: Set up developer namespaces to use installed packages 
 Perform steps of [Set up developer namespaces to use installed packages](#tap-dev-namespace)
 
-## <a id=tap-sample-app> Deploy Sample application
-
-Execute following command to see the demo of sample app deployment into Tanzu Application Platform
-
-```
-# login to kubernetes workload build cluster 
-kubectl config get-contexts
-kubectl config use-context <cluster config name>
-
-export app_name=tap-demo
-export git_app_url=https://github.com/sample-accelerators/spring-petclinic
-
-tanzu apps workload delete --all
-
-tanzu apps workload list
-
-#generate work load yml file
-tanzu apps workload create ${app_name} --git-repo ${git_app_url} --git-branch main --type web --label app.kubernetes.io/part-of=${app_name} --yes --dry-run
-
-
-#create work load for app
-tanzu apps workload create ${app_name} \
---git-repo ${git_app_url} \
---git-branch main \
---git-tag tap-1.0 \
---type web \
---label app.kubernetes.io/part-of=${app_name} \
---yes
-
-#app deployment logs
-tanzu apps workload tail ${app_name} --since 10m --timestamp
-
-#get app workload list
-tanzu apps workload list
-
-#get app details
-tanzu apps workload get ${app_name}
-
-#saved deliverables yaml configuration into local directory and remove unwated status section from it. check below sample file 
-kubectl get deliverables ${app_name} -o yaml > app-deli.yaml
-
-
-
-#sample deliverables 
-##################################################
-apiVersion: carto.run/v1alpha1
-kind: Deliverable
-metadata:
-  creationTimestamp: "2022-02-01T20:19:19Z"
-  generation: 1
-  labels:
-    app.kubernetes.io/component: deliverable
-    app.kubernetes.io/part-of: tap-demo
-    app.tanzu.vmware.com/deliverable-type: web
-    carto.run/cluster-supply-chain-name: source-to-url
-    carto.run/cluster-template-name: deliverable-template
-    carto.run/resource-name: deliverable
-    carto.run/template-kind: ClusterTemplate
-    carto.run/workload-name: tap-demo
-    carto.run/workload-namespace: default
-  name: tap-demo
-  namespace: default
-spec:
-  source:
-    image: tapdemo2.azurecr.io/supply-chain/tap-demo-default-bundle:83c468d4-4fd0-4f3b-9e57-9cdfe57e730a
-
-##################################################################
-
- # login to kubernetes workload run cluster 
-kubectl config get-contexts
-kubectl config use-context <cluster config name>  
-
-#apply app-deli into run cluster 
-
-kubeclt apply -f app-deli.yaml
-
-#check app status
-kubectl get deliverables ${app_name}
-
-#get app url 
-kubectl get all -A | grep serving
-
-#copy  app url and paste into browser to see the sample app
-
-```
-
+### Deploy Sample application 
+See the steps to deploy and test [sample application](#tap-sample-app). You can refer [Deploy Application documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-getting-started.html) for further details.
 
 
 ## <a id=tap-full> </a> Setup Tanzu Application Platform Workspace cluster
@@ -726,12 +673,98 @@ kubectl get svc -n tanzu-system-ingress
 ### Step 4: Set up developer namespaces to use installed packages 
 Perform steps of [Set up developer namespaces to use installed packages](#tap-dev-namespace)
 
+
+## <a id=tap-sample-app> Deploy Sample application
+
+Execute following command to see the demo of sample app deployment into Tanzu Application Platform
+
+```
+# login to kubernetes workload build cluster 
+kubectl config get-contexts
+kubectl config use-context <cluster config name>
+
+export app_name=tap-demo
+export git_app_url=https://github.com/sample-accelerators/spring-petclinic
+
+tanzu apps workload delete --all
+
+tanzu apps workload list
+
+#generate work load yml file
+tanzu apps workload create ${app_name} --git-repo ${git_app_url} --git-branch main --type web --label app.kubernetes.io/part-of=${app_name} --yes --dry-run
+
+
+#create work load for app
+tanzu apps workload create ${app_name} \
+--git-repo ${git_app_url} \
+--git-branch main \
+--git-tag tap-1.0 \
+--type web \
+--label app.kubernetes.io/part-of=${app_name} \
+--yes
+
+#app deployment logs
+tanzu apps workload tail ${app_name} --since 10m --timestamp
+
+#get app workload list
+tanzu apps workload list
+
+#get app details
+tanzu apps workload get ${app_name}
+
+#saved deliverables yaml configuration into local directory and remove unwated status section from it. check below sample file 
+kubectl get deliverables ${app_name} -o yaml > app-deli.yaml
+
+
+
+#sample deliverables 
+##################################################
+apiVersion: carto.run/v1alpha1
+kind: Deliverable
+metadata:
+  creationTimestamp: "2022-02-01T20:19:19Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/component: deliverable
+    app.kubernetes.io/part-of: tap-demo
+    app.tanzu.vmware.com/deliverable-type: web
+    carto.run/cluster-supply-chain-name: source-to-url
+    carto.run/cluster-template-name: deliverable-template
+    carto.run/resource-name: deliverable
+    carto.run/template-kind: ClusterTemplate
+    carto.run/workload-name: tap-demo
+    carto.run/workload-namespace: default
+  name: tap-demo
+  namespace: default
+spec:
+  source:
+    image: tapdemo2.azurecr.io/supply-chain/tap-demo-default-bundle:83c468d4-4fd0-4f3b-9e57-9cdfe57e730a
+
+##################################################################
+
+ # login to kubernetes workload run cluster 
+kubectl config get-contexts
+kubectl config use-context <cluster config name>  
+
+#apply app-deli into run cluster 
+
+kubeclt apply -f app-deli.yaml
+
+#check app status
+kubectl get deliverables ${app_name}
+
+#get app url 
+kubectl get all -A | grep serving
+
+#copy  app url and paste into browser to see the sample app
+
+```
+
+
 ### Troubleshooting Tanzu Application Platform
 
 You can use commad to see the tanu package installation failure reason `kubectl get packageinstall/<package> -n tap-install -o yaml`. Refer [Troubleshooting Tanzu Application Platform Tips](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-troubleshooting.html) 
 
-### Deploy Sample application 
-See the steps to deploy and test [sample application](#tap-sample-app). You can refer [Deploy Application documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-getting-started.html) for further details.
 
 ### Service Bindings for Kubernetes
 
