@@ -27,7 +27,7 @@ The following provides an overview of the major steps necessary to deploy Tanzu 
 1. [Setup Tanzu Application Platform Build cluster](#tap-build)
 2. [Setup Tanzu Application Platform Run cluster](#tap-run)
 3. [Setup Tanzu Application Platform UI cluster](#tap-ui)
-4. [Setup Tanzu Application Platform Full(personal) cluster](#tap-full)
+4. [Setup Tanzu Application Platform Workspace cluster](#tap-full)
 
 
 
@@ -600,7 +600,7 @@ kubectl get all -A | grep serving
 
 
 
-## <a id=tap-full> </a> Setup Tanzu Application Platform personal(full) cluster
+## <a id=tap-full> </a> Setup Tanzu Application Platform Workspace cluster
 
 ### Step 1: Install tanzu cluster essentials and tanzu cli - 
 Please ensure you login into Kubernetes UI cluster and perform steps of [Install tanzu cluster essentials and tanzu cli](#tanzu-essential). 
@@ -609,7 +609,7 @@ Please ensure you login into Kubernetes UI cluster and perform steps of [Install
 Perform steps of [Add the Tanzu Application Platform package repository](#tap-package-repo)
 
 
-### <a id=tap-profile-full> </a>Step 3: Install Tanzu Application Platform personal profile
+### <a id=tap-profile-full> </a>Step 3: Install Tanzu Application Platform Workspace profile
 
 Provide following user inputs to set environments variables into commands and execute them to install full profile
 
@@ -634,8 +634,8 @@ export git_catalog_url=<git_catalog_url>
 
 
 #APPEND GUI SETTINGS
-rm tap-values-personal.yaml
-cat <<EOF | tee tap-values-personal.yaml
+rm tap-values-workspace.yaml
+cat <<EOF | tee tap-values-workspace.yaml
 profile: full
 ceip_policy_disclosed: true
 buildservice:
@@ -696,7 +696,7 @@ excluded_packages:
 
 EOF
 
-tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values-personal.yaml -n tap-install
+tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file tap-values-workspace.yaml -n tap-install
 tanzu package installed get tap -n tap-install
 
 #check all build cluster package installed succesfully
