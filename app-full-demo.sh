@@ -83,7 +83,7 @@ pei "tanzu apps workload get ${app_name}"
 
 p " Generate ${app_name} delivery yaml "
 pei "kubectl get deliverables ${app_name} -o yaml |  yq 'del(.status)'  | yq 'del(.metadata.ownerReferences)' | yq 'del(.metadata.resourceVersion)' | yq 'del(.metadata.uid)' >  ${app_name}-delivery.yaml"
-                                                                                                                                                                                                                                            1,11          Top
+                                                                                                                                                                                                                                          
 
 p "show all tap clusters "
 pei "kubectl config get-contexts"
