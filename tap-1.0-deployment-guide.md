@@ -36,7 +36,7 @@ The following provides an overview of the major steps necessary to deploy Tanzu 
 3. [Setup Tanzu Application Platform UI cluster](#tap-ui)
 4. [Setup Tanzu Application Platform Workspace cluster](#tap-full)
 5. [App Deployment](#tap-sample-app)
-
+6. [Sample App Demo](app-full-demo.sh) - Download into your local jumpbox and execute with shell script editor. 
 
 
 ## <a id=tap-build> </a> Setup Tanzu Application Platform Build cluster
@@ -92,6 +92,20 @@ sudo install cli/core/v0.10.0/tanzu-core-linux_amd64 /usr/local/bin/tanzu
 export TANZU_CLI_NO_INIT=true
 tanzu plugin install --local cli all
 tanzu plugin list
+
+cd $HOME
+
+#install DEMO-MAGIC for app demo
+wget https://raw.githubusercontent.com/paxtonhare/demo-magic/master/demo-magic.sh
+sudo mv demo-magic.sh /usr/local/bin/demo-magic.sh
+chmod +x /usr/local/bin/demo-magic.sh
+
+sudo apt install pv #required for demo-magic
+
+#install yq package 
+sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+sudo chmod a+x /usr/local/bin/yq
+yq --version
 
 ```
 
@@ -713,7 +727,7 @@ tanzu apps workload list
 tanzu apps workload get ${app_name}
 
 #saved deliverables yaml configuration into local directory and remove unwated status section from it. check below sample file 
-kubectl get deliverables ${app_name} -o yaml > app-deli.yaml
+kubectl get deliverables ${app_name} -o yaml > app-delivery.yaml
 
 
 
@@ -746,15 +760,15 @@ spec:
 kubectl config get-contexts
 kubectl config use-context <cluster config name>  
 
-#apply app-deli into run cluster 
+#apply app-delivery into run cluster 
 
-kubeclt apply -f app-deli.yaml
+kubectl apply -f app-delivery.yaml
 
 #check app status
 kubectl get deliverables ${app_name}
 
 #get app url 
-kubectl get all -A | grep serving
+kubectl get all -A | grep route.serving.knative
 
 #copy  app url and paste into browser to see the sample app
 
