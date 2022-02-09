@@ -36,7 +36,7 @@ The following provides an overview of the major steps necessary to deploy Tanzu 
 3. [Setup Tanzu Application Platform UI cluster](#tap-ui)
 4. [Setup Tanzu Application Platform Workspace cluster](#tap-full)
 5. [App Deployment](#tap-sample-app)
-6. [Sample App Demo](app-full-demo.sh) - Download into your local jumpbox and execute with shell script editor. 
+6. [Multicluster App Lifecycle Demo](app-full-demo.sh) - Download into your local jumpbox and execute with shell script editor. 
 
 
 ## <a id=tap-build> </a> Setup Tanzu Application Platform Build cluster
@@ -726,8 +726,8 @@ tanzu apps workload list
 #get app details
 tanzu apps workload get ${app_name}
 
-#saved deliverables yaml configuration into local directory and remove unwated status section from it. check below sample file 
-kubectl get deliverables ${app_name} -o yaml > app-delivery.yaml
+#saved deliverables yaml configuration into local directory. check below sample file below 
+kubectl get deliverables ${app_name} -o yaml |  yq 'del(.status)'  | yq 'del(.metadata.ownerReferences)' | yq 'del(.metadata.resourceVersion)' | yq 'del(.metadata.uid)' >  ${app_name}-delivery.yaml"
 
 
 
