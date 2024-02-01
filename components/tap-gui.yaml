@@ -6,8 +6,6 @@ metadata:
   tags:
     - v1alpha1
   annotations:
-    'grafana/dashboard-selector': 'general'
-    'grafana/alert-label-selector': 'type=http-requests'
     'backstage.io/kubernetes-label-selector': 'app=backstage'
     'backstage.io/techdocs-ref': dir:.
 spec:
