@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: grafana-example
+  description: An example for Grafana integration.
+  annotations:
+    grafana/dashboard-selector: 'general'
+    grafana/alert-label-selector: 'type=http-requests'
