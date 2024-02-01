@@ -6,3 +6,10 @@ metadata:
   annotations:
     grafana/dashboard-selector: 'general'
     grafana/alert-label-selector: 'type=http-requests'
+    backstage.io/kubernetes-label-selector: app.kubernetes.io/part-of=tdp-configurator-grafana
+  links:
+    - url: http://tap.grafana.dbs.customer0.io/d/k8s_views_ns/tap-namespace-view?orgId=1
+      title: Namespace View
+      icon: dashboard
+    - url: http://tap.grafana.dbs.customer0.io/d/k8s_views_nodes/tap-node-view?orgId=1&refresh=30s
+      title: TAP Node View
