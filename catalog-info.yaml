@@ -8,6 +8,7 @@ metadata:
 spec:
   targets:
     - ./components/tap-gui.yaml
+    - ./components/grafana.yaml
     - ./groups/default-org.yaml
     - ./systems/tap-gui-system.yaml
     - ./domains/tap-gui-domain.yaml
